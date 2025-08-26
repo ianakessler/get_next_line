@@ -6,7 +6,7 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:56:03 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/25 16:38:58 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 17:35:35 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,7 @@ t_list	*find_last_node(t_list *list);
 void	append(t_list **list, char *buffer);
 void	create_list(t_list **list, int	fd);
 int	len_to_newline(t_list *list);
+void	print_nodes(t_list *list);
+
 
 #endif

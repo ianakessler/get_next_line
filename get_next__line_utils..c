@@ -6,7 +6,7 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 16:37:20 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/25 16:38:40 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 17:56:04 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	find_newline(t_list *list);
 t_list	*find_last_node(t_list *list);
 void	append(t_list **list, char *buffer);
 int	len_to_newline(t_list *list);
+void	print_nodes(t_list *list);
 
 int	find_newline(t_list *list)
 {
@@ -39,12 +40,14 @@ int	find_newline(t_list *list)
 
 t_list	*find_last_node(t_list *list)
 {
-	t_list *node;
+	t_list *tmp;
 
-	node = list;
-	while (node)
-		node = node->next;
-	return (node);
+	if (!list)
+		return (NULL);
+	tmp = list;
+	while (tmp->next)
+		tmp = tmp -> next;
+	return (tmp);
 }
 
 void	append(t_list **list, char *buffer)
@@ -77,7 +80,7 @@ int	len_to_newline(t_list *list)
 		i = 0;
 		while (list->str[i])
 		{
-			if (list->str == '\n')
+			if (list->str[i] == '\n')
 				return (++len);
 			i++;
 			len++;
@@ -85,4 +88,16 @@ int	len_to_newline(t_list *list)
 		list = list->next;
 	}
 	return (len);
+}
+
+void	print_nodes(t_list *list)
+{
+	int i = 0;
+	while (list)
+	{
+		printf("node: %s\n", list->str);
+		list = list->next;
+		i++;
+	}
+	printf("total de nodes: %d\n",i);
 }
