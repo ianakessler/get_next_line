@@ -21,7 +21,7 @@ typedef struct s_list
 {
 	char			*str;
 	struct s_list	*next;
-}	t_list;
+}					t_list;
 
 int	find_newline(char *s);
 

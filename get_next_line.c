@@ -20,6 +20,27 @@ char	*get_next_line(int fd)
 	list = NULL;
 }
 
+void	create_list(t_list **list, int	fd)
+{
+	int		chars_read;
+	char	*buff;
+
+	while (!find_newline(*list))
+	{
+		buff = malloc(BUFFER_SIZE + 1);
+		if (buff == NULL)
+			return ;
+		chars_read = read(fd, buff, BUFFER_SIZE);
+		if (!chars_read)
+		{
+			free(buff);
+			return ;
+		}
+		buff[chars_read] = '\0';
+		append(list, buff);
+	}
+}
+
 
 int	main(void)
 {
