@@ -12,12 +12,21 @@
 
 #include "get_next_line.h"
 
+char	*get_next_line(int fd);
+void	create_list(t_list **list, int	fd);
+
 char	*get_next_line(int fd)
 {
 	static t_list	*list;
 	char			*next_line;
 
 	list = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &next_line, 0) < 0)
+		return (NULL);
+	create_list(&list, fd);
+	if (list == NULL)
+		return (NULL);
+	next_line = get_line(list);
 }
 
 void	create_list(t_list **list, int	fd)
@@ -41,19 +50,24 @@ void	create_list(t_list **list, int	fd)
 	}
 }
 
+char	*get_line(t_list *list)
+{
+	char	*new_line;
+
+	new_line = malloc(len_to_newline(list) + 1);
+	if (!new_line)
+		return (NULL);
+	
+}
+
+char	*copy_str(t_list *list, char *line)
+{
+
+}
+
 
 int	main(void)
 {
-	int	fd;
-	char buffer[255];
-	int	chars_read;
-
-	fd = open("text.txt", O_RDONLY);
-
-	while ((chars_read = read(fd, buffer, 25)))
-	{
-		buffer[chars_read] = '\0';
-		printf("buf -> %s\n", buffer);
-	}
-	return (0);
+	int fd = open("text.txt", O_RDONLY);
+	get_next_line(fd);
 }
