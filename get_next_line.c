@@ -6,7 +6,7 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 15:56:04 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/26 20:00:13 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 20:14:53 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,11 +119,13 @@ void	clear_list(t_list **list)
 }
 
 
-int	main(void)
-{
-	int fd = open("text.txt", O_RDONLY);
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-
-}
+// int	main(void)
+// {
+// 	int fd = open("text.txt", O_RDONLY);
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// }
