@@ -6,7 +6,7 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:56:03 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/26 17:35:35 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 19:11:55 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,12 @@ typedef struct s_list
 int	find_newline(t_list *list);
 t_list	*find_last_node(t_list *list);
 void	append(t_list **list, char *buffer);
-void	create_list(t_list **list, int	fd);
 int	len_to_newline(t_list *list);
-void	print_nodes(t_list *list);
-
+void	free_list(t_list **list, t_list *new_node, char *buffer);
+char	*get_next_line(int fd);
+void	create_list(t_list **list, int	fd);
+char	*get_line(t_list *list);
+void	copy_str(t_list *list, char *str);
+void	clear_list(t_list **list);
 
 #endif

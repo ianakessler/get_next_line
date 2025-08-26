@@ -6,7 +6,7 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 15:56:04 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/26 17:38:25 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 20:00:13 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ char	*get_next_line(int fd);
 void	create_list(t_list **list, int	fd);
 char	*get_line(t_list *list);
 void	copy_str(t_list *list, char *str);
+void	clear_list(t_list **list);
 
 char	*get_next_line(int fd)
 {
@@ -23,7 +24,7 @@ char	*get_next_line(int fd)
 	char			*next_line;
 
 	list = NULL;
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &next_line, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	create_list(&list, fd);
 	if (list == NULL)
@@ -62,7 +63,6 @@ char	*get_line(t_list *list)
 		return (NULL);
 	str_len = len_to_newline(list);
 	new_line = malloc(str_len + 1);
-	printf("Len to new line = %d\n", str_len);
 	if (!new_line)
 		return (NULL);
 	copy_str(list, new_line);
@@ -75,7 +75,6 @@ void	copy_str(t_list *list, char *str)
 	int	k;
 
 	k = 0;
-	print_nodes(list);
 	while (list)
 	{
 		i = 0;
@@ -94,9 +93,37 @@ void	copy_str(t_list *list, char *str)
 	str[k] = 0;
 }
 
+void	clear_list(t_list **list)
+{
+	t_list	*last_node;
+	t_list	*clean_node;
+	int		i;
+	int		k;
+	char	*buffer;
+
+	buffer = malloc(BUFFER_SIZE + 1);
+	clean_node = malloc(sizeof(t_list));
+	if (buffer == NULL || clean_node == NULL)
+		return ;
+	last_node = find_last_node(*list);
+	i = 0;
+	k = 0;
+	while (last_node->str[i] != '\0' || last_node->str[i] != '\n')
+		i++;
+	while(last_node->str[i] != '\0' && last_node->str[++i] != '\0')
+		buffer[k++] = last_node->str[i];
+	buffer[k] = '\0';
+	clean_node->str = buffer;
+	clean_node->next = NULL;
+	free_list(list, clean_node, buffer);
+}
+
 
 int	main(void)
 {
 	int fd = open("text.txt", O_RDONLY);
-	printf("get_next_line: %s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+
 }

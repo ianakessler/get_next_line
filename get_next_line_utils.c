@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next__line_utils..c                            :+:      :+:    :+:   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 16:37:20 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/26 17:56:04 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/08/26 19:29:18 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	find_newline(t_list *list);
 t_list	*find_last_node(t_list *list);
 void	append(t_list **list, char *buffer);
 int	len_to_newline(t_list *list);
-void	print_nodes(t_list *list);
+void	free_list(t_list **list, t_list *new_node, char *buffer);
 
 int	find_newline(t_list *list)
 {
@@ -90,14 +90,23 @@ int	len_to_newline(t_list *list)
 	return (len);
 }
 
-void	print_nodes(t_list *list)
+void	free_list(t_list **list, t_list *new_node, char *buffer)
 {
-	int i = 0;
-	while (list)
+	t_list	*tmp;
+
+	while (*list)
 	{
-		printf("node: %s\n", list->str);
-		list = list->next;
-		i++;
+		tmp = (*list)->next;
+		free((*list)->str);
+		free(*list);
+		*list = tmp;
 	}
-	printf("total de nodes: %d\n",i);
+	*list = NULL;
+	if (new_node->str[0])
+		*list = new_node;
+	else
+	{
+		free(buffer);
+		free(new_node);
+	}
 }
