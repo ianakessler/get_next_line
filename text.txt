@@ -1,5 +1,0 @@
-ola     s
-mundo
-42
-iaratang
-luca

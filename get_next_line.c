@@ -12,120 +12,156 @@
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd);
-void	create_list(t_list **list, int	fd);
-char	*get_line(t_list *list);
-void	copy_str(t_list *list, char *str);
-void	clear_list(t_list **list);
+void	*ft_calloc(size_t count, size_t size);
+size_t	ft_strlen(const char *c);
+char	*ft_strjoin(const char *s1, const char *s2);
+char	*ft_strchr(const char *str, int c);
+char	*ft_strdup(const char *s1);
+char    *reset_bucket(char  *bucket);
 
-char	*get_next_line(int fd)
+char    *get_next_line(int fd)
 {
-	static t_list	*list;
-	char			*next_line;
+    static char *bucket;
+    char        *buffer;
+    char        *temp;
+    int         chars_read;
 
-	list = NULL;
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	create_list(&list, fd);
-	if (list == NULL)
-		return (NULL);
-	next_line = get_line(list);
-	return (next_line);
+    buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+    chars_read = 1;
+    if (!bucket)
+        bucket = ft_calloc(1, 1);
+    while (!ft_strchr(bucket, '\n'))
+    {
+        chars_read = read(fd, buffer, BUFFER_SIZE);
+        if (chars_read <= 0)
+        {
+            free(buffer);
+            return (bucket);
+        }
+        buffer[chars_read] = '\0';
+        temp = ft_calloc(ft_strlen(bucket), sizeof(char));
+        temp = ft_strdup(bucket);
+        free(bucket);
+        bucket = ft_strjoin(temp, buffer);
+        free(temp);
+    }
+    temp = ft_strdup(bucket);
+    bucket = reset_bucket(bucket);
+    return (temp);
 }
 
-void	create_list(t_list **list, int	fd)
+char    *reset_bucket(char  *bucket)
 {
-	int		chars_read;
-	char	*buff;
+    char    *temp;
+    char    *bucket_trim;
 
-	while (!find_newline(*list))
+    bucket_trim = ft_strchr(bucket, '\n');
+    if (!bucket_trim)
+    {
+        free(bucket);
+        return (NULL);
+    }
+    temp = ft_strdup(bucket_trim + 1);
+    free(bucket);
+    return (temp);
+}
+
+size_t	ft_strlen(const char *c)
+{
+	size_t	i;
+
+	i = 0;
+	while (c[i])
+		i++;
+	return (i);
+}
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	unsigned char	*tmp;
+	size_t			i;
+
+	i = 0;
+	tmp = (void *)malloc(count * size);
+	if (!tmp)
+		return (NULL);
+	while (tmp[i])
 	{
-		buff = malloc(BUFFER_SIZE + 1);
-		if (buff == NULL)
-			return ;
-		chars_read = read(fd, buff, BUFFER_SIZE);
-		if (!chars_read)
-		{
-			free(buff);
-			return ;
-		}
-		buff[chars_read] = '\0';
-		append(list, buff);
+		tmp[i] = 0;
+		i++;
 	}
+	return (tmp);
 }
 
-char	*get_line(t_list *list)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
-	char	*new_line;
-	int		str_len;
+	char	*str;
+	size_t	len_s1;
+	size_t	len_s2;
+	size_t	i;
+	size_t	j;
 
-	if (!list)
-		return (NULL);
-	str_len = len_to_newline(list);
-	new_line = malloc(str_len + 1);
-	if (!new_line)
-		return (NULL);
-	copy_str(list, new_line);
-	return (new_line);
+	len_s1 = ft_strlen(s1);
+	len_s2 = ft_strlen(s2);
+	str = (char *)malloc(len_s1 + len_s2 + 1);
+	if (!str)
+		return (0);
+	i = 0;
+	while (i < len_s1)
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	j = 0;
+	while (j < len_s2)
+	{
+		str[i + j] = s2[j];
+		j++;
+	}
+	str[i + j] = '\0';
+	return (str);
 }
 
-void	copy_str(t_list *list, char *str)
+char	*ft_strchr(const char *str, int c)
 {
 	int	i;
-	int	k;
 
-	k = 0;
-	while (list)
-	{
-		i = 0;
-		while (list->str[i])
-		{
-			if (list->str[i] == '\n')
-			{
-				str[k++] = '\n';
-				str[k] = '\0';
-				return;
-			}
-			str[k++] = list->str[i++];
-		}
-		list = list->next;
-	}
-	str[k] = 0;
-}
-
-void	clear_list(t_list **list)
-{
-	t_list	*last_node;
-	t_list	*clean_node;
-	int		i;
-	int		k;
-	char	*buffer;
-
-	buffer = malloc(BUFFER_SIZE + 1);
-	clean_node = malloc(sizeof(t_list));
-	if (buffer == NULL || clean_node == NULL)
-		return ;
-	last_node = find_last_node(*list);
 	i = 0;
-	k = 0;
-	while (last_node->str[i] != '\0' || last_node->str[i] != '\n')
+	while (str[i])
+	{
+		if (str[i] == (unsigned char) c)
+			return ((char *)&str[i]);
 		i++;
-	while(last_node->str[i] != '\0' && last_node->str[++i] != '\0')
-		buffer[k++] = last_node->str[i];
-	buffer[k] = '\0';
-	clean_node->str = buffer;
-	clean_node->next = NULL;
-	free_list(list, clean_node, buffer);
+	}
+	if (str[i] == (unsigned char) c)
+		return ((char *)&str[i]);
+	return (NULL);
 }
 
+char	*ft_strdup(const char *s1)
+{
+	char	*cpy_s1;
+	size_t	i;
 
-// int	main(void)
-// {
-// 	int fd = open("text.txt", O_RDONLY);
-// 	printf("%s", get_next_line(fd));
-// 	printf("%s", get_next_line(fd));
-// 	printf("%s", get_next_line(fd));
-// 	printf("%s", get_next_line(fd));
-// 	printf("%s", get_next_line(fd));
-// 	printf("%s", get_next_line(fd));
-// }
+	i = 0;
+	cpy_s1 = (char *)malloc(ft_strlen(s1) + 1);
+	if (!cpy_s1)
+		return (NULL);
+	while (s1[i])
+	{
+		cpy_s1[i] = s1[i];
+		i++;
+	}
+	cpy_s1[i] = 0;
+	return (cpy_s1);
+}
+
+int main(void)
+{
+    int fd = open("t.txt", O_RDONLY);
+    printf("%s", get_next_line(fd));
+    printf("%s", get_next_line(fd));
+    printf("%s", get_next_line(fd));
+    printf("%s", get_next_line(fd));
+    printf("%s", get_next_line(fd));
+}

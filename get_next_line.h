@@ -22,21 +22,5 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-typedef struct s_list
-{
-	char			*str;
-	struct s_list	*next;
-}					t_list;
-
-int	find_newline(t_list *list);
-t_list	*find_last_node(t_list *list);
-void	append(t_list **list, char *buffer);
-int	len_to_newline(t_list *list);
-void	free_list(t_list **list, t_list *new_node, char *buffer);
-char	*get_next_line(int fd);
-void	create_list(t_list **list, int	fd);
-char	*get_line(t_list *list);
-void	copy_str(t_list *list, char *str);
-void	clear_list(t_list **list);
 
 #endif
