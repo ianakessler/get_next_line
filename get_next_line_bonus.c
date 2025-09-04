@@ -1,42 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 15:56:04 by iaratang          #+#    #+#             */
-/*   Updated: 2025/09/04 17:45:36 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:45:40 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char		*reset_bucket(char *bucket);
 char		*create_new_line(char *bucket);
 void		*free_all(char **buffer, char **bucket);
-static char	*fill_bucket(int fd, char *bucket, char *buffer);
+char		*fill_bucket(int fd, char *bucket, char *buffer);
 
 char	*get_next_line(int fd)
 {
-	static char	*bucket;
+	static char	*bucket[MAX_FD];
 	char		*buffer;
 	char		*temp;
 
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (free_all(&bucket, &buffer));
-	if (!bucket)
-		bucket = ft_calloc(1, 1);
-	bucket = fill_bucket(fd, bucket, buffer);
-	if (!bucket)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > MAX_FD)
+		return (free_all(&bucket[fd], &buffer));
+	if (!bucket[fd])
+		bucket[fd] = ft_calloc(1, 1);
+	bucket[fd] = fill_bucket(fd, bucket[fd], buffer);
+	if (!bucket[fd])
 		return (NULL);
-	temp = create_new_line(bucket);
-	bucket = reset_bucket(bucket);
+	temp = create_new_line(bucket[fd]);
+	bucket[fd] = reset_bucket(bucket[fd]);
 	return (temp);
 }
 
-static char	*fill_bucket(int fd, char *bucket, char *buffer)
+char	*fill_bucket(int fd, char *bucket, char *buffer)
 {
 	char	*temp;
 	int		chars_read;
