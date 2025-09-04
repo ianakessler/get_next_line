@@ -6,162 +6,113 @@
 /*   By: iaratang <iaratang@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 15:56:04 by iaratang          #+#    #+#             */
-/*   Updated: 2025/08/26 20:14:53 by iaratang         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:20:31 by iaratang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	*ft_calloc(size_t count, size_t size);
-size_t	ft_strlen(const char *c);
-char	*ft_strjoin(const char *s1, const char *s2);
-char	*ft_strchr(const char *str, int c);
-char	*ft_strdup(const char *s1);
-char    *reset_bucket(char  *bucket);
+char		*reset_bucket(char *bucket);
+char		*create_new_line(char *bucket);
+void		*free_all(char **buffer, char **bucket);
+static char	*fill_bucket(int fd, char *bucket, char *buffer);
 
-char    *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-    static char *bucket;
-    char        *buffer;
-    char        *temp;
-    int         chars_read;
+	static char	*bucket;
+	char		*buffer;
+	char		*temp;
 
-    buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-    chars_read = 1;
-    if (!bucket)
-        bucket = ft_calloc(1, 1);
-    while (!ft_strchr(bucket, '\n'))
-    {
-        chars_read = read(fd, buffer, BUFFER_SIZE);
-        if (chars_read <= 0)
-        {
-            free(buffer);
-            return (bucket);
-        }
-        buffer[chars_read] = '\0';
-        temp = ft_calloc(ft_strlen(bucket), sizeof(char));
-        temp = ft_strdup(bucket);
-        free(bucket);
-        bucket = ft_strjoin(temp, buffer);
-        free(temp);
-    }
-    temp = ft_strdup(bucket);
-    bucket = reset_bucket(bucket);
-    return (temp);
-}
-
-char    *reset_bucket(char  *bucket)
-{
-    char    *temp;
-    char    *bucket_trim;
-
-    bucket_trim = ft_strchr(bucket, '\n');
-    if (!bucket_trim)
-    {
-        free(bucket);
-        return (NULL);
-    }
-    temp = ft_strdup(bucket_trim + 1);
-    free(bucket);
-    return (temp);
-}
-
-size_t	ft_strlen(const char *c)
-{
-	size_t	i;
-
-	i = 0;
-	while (c[i])
-		i++;
-	return (i);
-}
-
-void	*ft_calloc(size_t count, size_t size)
-{
-	unsigned char	*tmp;
-	size_t			i;
-
-	i = 0;
-	tmp = (void *)malloc(count * size);
-	if (!tmp)
+	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (free_all(&bucket, &buffer));
+	if (!bucket)
+		bucket = ft_calloc(1, 1);
+	bucket = fill_bucket(fd, bucket, buffer);
+	if (!bucket)
 		return (NULL);
-	while (tmp[i])
-	{
-		tmp[i] = 0;
-		i++;
-	}
-	return (tmp);
+	temp = create_new_line(bucket);
+	bucket = reset_bucket(bucket);
+	return (temp);
 }
 
-char	*ft_strjoin(const char *s1, const char *s2)
+static char	*fill_bucket(int fd, char *bucket, char *buffer)
 {
-	char	*str;
-	size_t	len_s1;
-	size_t	len_s2;
-	size_t	i;
-	size_t	j;
+	char	*temp;
+	int		chars_read;
 
-	len_s1 = ft_strlen(s1);
-	len_s2 = ft_strlen(s2);
-	str = (char *)malloc(len_s1 + len_s2 + 1);
-	if (!str)
-		return (0);
-	i = 0;
-	while (i < len_s1)
+	chars_read = 1;
+	while (!ft_strchr(bucket, '\n') && chars_read > 0)
 	{
-		str[i] = s1[i];
-		i++;
+		chars_read = read(fd, buffer, BUFFER_SIZE);
+		if (chars_read < 0)
+		{
+			free(buffer);
+			free(bucket);
+			return (NULL);
+		}
+		buffer[chars_read] = '\0';
+		temp = ft_strdup(bucket);
+		free(bucket);
+		bucket = ft_strjoin(temp, buffer);
+		free(temp);
 	}
-	j = 0;
-	while (j < len_s2)
-	{
-		str[i + j] = s2[j];
-		j++;
-	}
-	str[i + j] = '\0';
-	return (str);
+	free(buffer);
+	return (bucket);
 }
 
-char	*ft_strchr(const char *str, int c)
+char	*reset_bucket(char *bucket)
 {
-	int	i;
+	char	*temp;
+	char	*bucket_trim;
 
-	i = 0;
-	while (str[i])
+	bucket_trim = ft_strchr(bucket, '\n');
+	if (!bucket_trim)
 	{
-		if (str[i] == (unsigned char) c)
-			return ((char *)&str[i]);
-		i++;
+		free(bucket);
+		bucket = NULL;
+		return (NULL);
 	}
-	if (str[i] == (unsigned char) c)
-		return ((char *)&str[i]);
+	temp = ft_strdup(bucket_trim + 1);
+	free(bucket);
+	return (temp);
+}
+
+void	*free_all(char **buffer, char **bucket)
+{
+	if (buffer && *buffer)
+	{
+		free(*buffer);
+		*buffer = NULL;
+	}
+	if (bucket && *bucket)
+	{
+		free(*bucket);
+		*bucket = NULL;
+	}
 	return (NULL);
 }
 
-char	*ft_strdup(const char *s1)
+char	*create_new_line(char *bucket)
 {
-	char	*cpy_s1;
-	size_t	i;
+	int		i;
+	char	*temp;
+	char	*res;
 
+	temp = ft_strdup(bucket);
 	i = 0;
-	cpy_s1 = (char *)malloc(ft_strlen(s1) + 1);
-	if (!cpy_s1)
-		return (NULL);
-	while (s1[i])
+	if (temp[0] == 0)
 	{
-		cpy_s1[i] = s1[i];
+		free(temp);
+		return (NULL);
+	}
+	while (temp[i])
+	{
+		if (temp[i] == '\n')
+			temp[i + 1] = '\0';
 		i++;
 	}
-	cpy_s1[i] = 0;
-	return (cpy_s1);
-}
-
-int main(void)
-{
-    int fd = open("t.txt", O_RDONLY);
-    printf("%s", get_next_line(fd));
-    printf("%s", get_next_line(fd));
-    printf("%s", get_next_line(fd));
-    printf("%s", get_next_line(fd));
-    printf("%s", get_next_line(fd));
+	res = ft_strdup(temp);
+	free(temp);
+	return (res);
 }

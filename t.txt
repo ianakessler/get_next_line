@@ -1,5 +1,0 @@
-ola mundo
-aaa
-bbb
-ccc
-ddd
